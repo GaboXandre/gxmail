@@ -29,6 +29,7 @@ parser.add_argument('-i', '--interactive', help='Launch compose prompt.', requir
 args = parser.parse_args()
 
 
+
 # PROFILE MANAGEMENT SECTION
 def create_profile(defprofile):
 	default_file = FileLocations['ProfileDir']+'/default'
@@ -102,8 +103,6 @@ def interactive_mode(values):
 	print '-'*80
 	profile = select_profile(values[0])
 	
-	print 'Using Profile: '+str(profile[0])
-	print profile
 	if profile[0] == 'default':
 		p = raw_input('Profile (default): ')
 		if p == '':
