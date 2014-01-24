@@ -1,12 +1,17 @@
 # GXMAIL v1.0.0  
 
 
-gxmail is a simple smtp client designed to send emails from the linux command line.
+*gxmail* is a simple smtp client designed to send emails from the linux command line.
 It is particularly useful to use with bash scripts. 
-gxmail supports multiple profiles (email accounts)
+*gxmail* supports multiple profiles (email accounts)
+
+# Features
+* smtp
+* multiple profiles
+* multiple recepients
+* load email body from file
 
 # Options:
-
   -h, --help            show this help message and exit
   -p PROFILE, --profile PROFILE
                         Select profile to be used.
@@ -16,7 +21,6 @@ gxmail supports multiple profiles (email accounts)
                         subject line.
   -m MESSAGE, --message MESSAGE
                         Import email body from text file.
-  -i, --interactive     Launch compose prompt.
 
 # License:
 
