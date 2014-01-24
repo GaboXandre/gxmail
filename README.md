@@ -1,5 +1,5 @@
 ##################
-# GXMAIL v1.3.0  #
+# GXMAIL v1.0.0  #
 ##################
 
 gxmail is a simple smtp client designed to send emails from the linux command line.

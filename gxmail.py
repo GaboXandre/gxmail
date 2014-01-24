@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ###############################################################
-# GXMAIL v1.3.0
+# GXMAIL v1.0
 ###############################################################
 import smtplib # for smtp support
 import sys
@@ -10,7 +10,7 @@ import simplejson as json # to profiled stored in json files
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.3.0',
+			'Version' : '1.0.0',
 			'Author' : 'Gabriel Godoy',
 			'License' : 'GPL3',
 			'copyright' : '2014 Gabriel Godoy'
