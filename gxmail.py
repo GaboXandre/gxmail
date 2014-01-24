@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ###############################################################
-# GXMAIL v1.0
+# LOGIC MODULE
 ###############################################################
 import smtplib # for smtp support
 import sys
@@ -10,7 +10,7 @@ import simplejson as json # to profiled stored in json files
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.0.0',
+			'Version' : '1.1.0',
 			'Author' : 'Gabriel Godoy',
 			'License' : 'GPL3',
 			'copyright' : '2014 Gabriel Godoy'
@@ -22,10 +22,9 @@ FileLocations = { 'ProfileDir' : os.path.expanduser('~/.gxmail/')}
 # Command Line Flags and options
 parser = argparse.ArgumentParser(description='%s is a simple text smpt client to send email from the command line. Very useful for scripts.' %(AppInfo['AppName']))
 parser.add_argument('-p', '--profile', help='Select profile to be used.', required=False)
-parser.add_argument('-to', help='Receipient. You may include several email addresses separating them with a comma. DO NOT use spaces', required=True)
-parser.add_argument('-s', '--subject', help='subject line.', required=True)
+parser.add_argument('-to', help='Receipient. You may include several email addresses separating them with a comma. DO NOT use spaces', required=False)
+parser.add_argument('-s', '--subject', help='subject line.', required=False)
 parser.add_argument('-m', '--message', help='Import email body from text file.', required=False)
-#parser.parse_args(file['out.txt'])
 parser.add_argument('-i', '--interactive', help='Launch compose prompt.', required=False, action="store_true")
 args = parser.parse_args()
 
@@ -38,25 +37,6 @@ def create_profile(defprofile):
 	default.close()
 	res = 'You are ready to send emails with your new profile!'
 	return res
-
-def additional_profiles():
-	print '-'*80
-	print "So you wan't to add a new profile? Let's do it!"
-	print '-'*80
-	name = raw_input('Name your profile -> ')
-	server = raw_input('Server -> ')
-	port = raw_input('Port -> ')
-	email = raw_input('Your email -> ')
-	password = raw_input('Your password -> ')
-
-	profile = []
-	profile.append(name)
-	profile.append(server)
-	profile.append(port)
-	profile.append(email)
-	profile.append(password)
-	
-	create_profile(profile)
 
 def test_profiles():
 	f = []
@@ -84,7 +64,57 @@ def test_profiles():
 		
 		
 	else:
-		send_mail()
+		test_options()
+
+def interactive_mode(values):
+	print '-'*80
+	print 'Interactive Mode'
+	print '-'*80
+	profile = select_profile()
+	
+	print profile[0]
+	if profile[0] == 'default':
+		p = raw_input('Profile (default): ')
+		if p == '':
+			profile[0] = args.profile
+		else:
+			profile[0] = p
+		select_profile()
+		values[0] = profile
+	if values[1] == 0:
+		t = raw_input('To: ')
+		values[1] = t
+	elif values[2] == 0:
+		s = raw_input('Subject: ')
+		values[2] = s
+	elif values[3] == 'empty':
+		m = raw_input('Body File Path: ')
+		values[3] = m
+
+	send_mail(values)
+
+def test_options():
+	values = [args.profile, args.to, args.subject, args.message]
+	p = select_profile()
+	t = str(args.to)
+	s = str(args.subject)
+	m = str(args.message)
+	i = args.interactive
+	if i is True:
+		values = [p,0,0,'empty']
+		interactive_mode(values)
+	elif t == 'None':
+		values[1] = 0
+		interactive_mode(values)
+	elif s == 'None':
+		values[2] = 0
+		interactive_mode(values)
+	elif m == 'None':
+		values[3] = 'empty'
+		interactive_mode(values)
+	else:
+		values = [args.profile, args.to, args.subject, args.message]
+		send_mail(values)
 
 #Main Program
 def select_profile():
@@ -116,17 +146,18 @@ def initialize_smtp_server(profile):
     smtpserver.login(email, password)
     return smtpserver
 
-def send_mail():
-    profile = select_profile()
-    to_email = args.to
+def send_mail(values):
+	
+    profile = values[0]
+    to_email = values[1] #args.to
     from_email = profile[3]
-    subject = args.subject
+    subject = values[2] #args.subject
     
     # parse message from text file
     header = "To:%s\nFrom:%s\nSubject:%s \n" % (to_email, from_email, subject)
 	
 	# extract message content from file
-    file_name = args.message
+    file_name = values[3] #args.message
     the_file = open(file_name)
     msg = the_file.read()
     the_file.close()
