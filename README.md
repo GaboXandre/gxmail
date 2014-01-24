@@ -75,4 +75,5 @@ email: gabo.xandre@gmail.com
 
 # ChangeLog
 v1.1.0 Adds interactive mode
+
 v1.1.1 Adds batch mode, reads recepients form text file
