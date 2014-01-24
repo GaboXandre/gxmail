@@ -13,14 +13,19 @@ It is particularly useful to use with bash scripts.
 
 # Options:
   -h, --help            show this help message and exit
+  
   -p PROFILE, --profile PROFILE
                         Select profile to be used.
+                        
   -to TO                Receipient. You may include several email addresses
                         separating them with a comma. DO NOT use spaces
+                        
   -s SUBJECT, --subject SUBJECT
                         subject line.
+                        
   -m MESSAGE, --message MESSAGE
                         Import email body from text file.
+                        
 
 # License:
 
