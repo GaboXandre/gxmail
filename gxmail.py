@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ###############################################################
-# LOGIC MODULE
+# GXMAIL v1.3.0
 ###############################################################
 import smtplib # for smtp support
 import sys
