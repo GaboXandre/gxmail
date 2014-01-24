@@ -10,7 +10,7 @@ import simplejson as json # to profiled stored in json files
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.0',
+			'Version' : '1.1.1[beta]',
 			'Author' : 'Gabriel Godoy',
 			'License' : 'GPL3',
 			'copyright' : '2014 Gabriel Godoy'
@@ -26,6 +26,7 @@ parser.add_argument('-to', help='Receipient. You may include several email addre
 parser.add_argument('-s', '--subject', help='subject line.', required=False)
 parser.add_argument('-m', '--message', help='Import email body from text file.', required=False)
 parser.add_argument('-i', '--interactive', help='Launch compose prompt.', required=False, action="store_true")
+parser.add_argument('-b', '--batch', help='Batch mode: get recepients from a text file.', required=False)
 args = parser.parse_args()
 
 
@@ -76,6 +77,8 @@ def test_options():
 	s = str(args.subject)
 	m = str(args.message)
 	i = args.interactive
+	b = str(args.batch)
+	
 	int_mode = 'off'
 	if i is True:
 		values = [p,0,0,'empty']
@@ -89,7 +92,12 @@ def test_options():
 	if m == 'None':
 		values[3] = 'empty'
 		int_mode = 'on'
-	
+
+	if b != 'None':
+		values = [p, args.to, args.subject, args.message]
+		int_mode = 'off'
+		batch_mode(values)
+
 	if int_mode == 'on':
 		interactive_mode(values)
 	else:
@@ -123,8 +131,27 @@ def interactive_mode(values):
 		values[3] = str(m)
 
 	send_mail(values)
+	print 'email sent to: '+str(values[1])
 
-
+def batch_mode(values):
+	# a. get file
+	batch_file_path = str(args.batch)
+	batch_file = open(batch_file_path) 
+	mail_list = []
+	# b. iterate file convert to list
+	with batch_file as f:
+		for line in f:
+		    x = line.rstrip( )
+		    mail_list.append(x)
+		batch_file.close()
+	# b. iterate list and send emails
+	length = len(mail_list)
+	cntr = 0
+	while cntr < length:
+		values[1] = mail_list[cntr]
+		send_mail(values)
+		print 'email sent to: '+str(mail_list[cntr])
+		cntr += 1
 
 def select_profile(profile):
 	profile = str(profile)
