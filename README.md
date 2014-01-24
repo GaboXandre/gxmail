@@ -24,6 +24,8 @@ It is particularly useful to use with bash scripts.
                         
   -m MESSAGE, --message MESSAGE
                         Import email body from text file.
+  -i,         --interactive
+  						Interactive prompt. 
                         
 
 # Instalation Notes

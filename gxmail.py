@@ -28,6 +28,7 @@ parser.add_argument('-m', '--message', help='Import email body from text file.',
 parser.add_argument('-i', '--interactive', help='Launch compose prompt.', required=False, action="store_true")
 args = parser.parse_args()
 
+
 # PROFILE MANAGEMENT SECTION
 def create_profile(defprofile):
 	default_file = FileLocations['ProfileDir']+'/default'
@@ -66,65 +67,72 @@ def test_profiles():
 	else:
 		test_options()
 
-def interactive_mode(values):
-	print '-'*80
-	print 'Interactive Mode'
-	print '-'*80
-	profile = select_profile()
-	
-	print profile[0]
-	if profile[0] == 'default':
-		p = raw_input('Profile (default): ')
-		if p == '':
-			profile[0] = args.profile
-		else:
-			profile[0] = p
-		select_profile()
-		values[0] = profile
-	if values[1] == 0:
-		t = raw_input('To: ')
-		values[1] = t
-	elif values[2] == 0:
-		s = raw_input('Subject: ')
-		values[2] = s
-	elif values[3] == 'empty':
-		m = raw_input('Body File Path: ')
-		values[3] = m
-
-	send_mail(values)
 
 def test_options():
 	values = [args.profile, args.to, args.subject, args.message]
-	p = select_profile()
+	p = select_profile(values[0])
 	t = str(args.to)
 	s = str(args.subject)
 	m = str(args.message)
 	i = args.interactive
+	int_mode = 'off'
 	if i is True:
 		values = [p,0,0,'empty']
-		interactive_mode(values)
-	elif t == 'None':
+		int_mode = 'on'
+	if t == 'None':
 		values[1] = 0
-		interactive_mode(values)
-	elif s == 'None':
+		int_mode = 'on'
+	if s == 'None':
 		values[2] = 0
-		interactive_mode(values)
-	elif m == 'None':
+		int_mode = 'on'
+	if m == 'None':
 		values[3] = 'empty'
+		int_mode = 'on'
+	
+	if int_mode == 'on':
 		interactive_mode(values)
 	else:
-		values = [args.profile, args.to, args.subject, args.message]
+		values = [p, args.to, args.subject, args.message]
 		send_mail(values)
 
-#Main Program
-def select_profile():
-	profile = str(args.profile)
+
+def interactive_mode(values):
+	print '-'*80
+	print 'Interactive Mode'
+	print '-'*80
+	profile = select_profile(values[0])
+	
+	print 'Using Profile: '+str(profile[0])
+	print profile
+	if profile[0] == 'default':
+		p = raw_input('Profile (default): ')
+		if p == '':
+			profile[0] = 'default'
+		else:
+			profile[0] = p
+		select_profile(profile[0])
+		values[0] = profile
+
+	if values[1] == 0:
+		t = raw_input('To: ')
+		values[1] = t
+	if values[2] == 0:
+		s = raw_input('Subject: ')
+		values[2] = s
+	if values[3] == 'empty':
+		m = raw_input('Body File Path: ')
+		values[3] = str(m)
+
+	send_mail(values)
+
+
+
+def select_profile(profile):
+	profile = str(profile)
 	if profile == 'None':
 		profile_name = 'default'
-		#return profile
 	else:
-		profile_name = str(args.profile)
-		#return profile
+		profile_name = str(profile)
 	profile_location = FileLocations['ProfileDir']+profile_name
 	# load profile info
 	myfile = open(profile_location)
