@@ -1,4 +1,4 @@
-# GXMAIL v1.1.1 
+# GXMAIL v1.1.2
 
 *gxmail* is a simple smtp client designed to send emails from the linux command line.
 It is particularly useful to use with bash scripts. 
@@ -10,7 +10,12 @@ It is particularly useful to use with bash scripts.
 * multiple recepients
 * load email body from file
 
-# Options
+# Usage
+
+## Options
+The following options are available
+
+
   -h, --help            show this help message and exit
   
   -p PROFILE, --profile PROFILE
@@ -24,9 +29,20 @@ It is particularly useful to use with bash scripts.
                         
   -m MESSAGE, --message MESSAGE
                         Import email body from text file.
-  -i,         --interactive
-  						Interactive prompt. 
-                        
+
+## Interactive Mode
+
+If called without parameters, *gxmail* will run in interactive mode.
+
+## Batch mode 
+
+**[-b FILE.TXT --batch FILE.TXT]**
+In batch mode, *gxmail* will read a list recepients from a text file.
+*Notes:*
+* The file must be plain text and contain one email per line
+* *batch mode* is NOT compatible with *interactive mode*, you must provide parameters: to, subject, and message. Only the profile may be ommitted, in which case, the default profile is used.
+
+*Spam is illegal, and it means you are evil if you use this software for that purpose.*
 
 # Instalation Notes
 ## Dependencies
