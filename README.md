@@ -44,9 +44,8 @@ It is particularly useful to use with bash scripts.
 
 ## First Run
 When you first run *gxmail.py* it will prompt you to create your default profile:
-> -------------------------------------------------------
+
 > You don't have a profile set up yet. Let's do it now!
-> -------------------------------------------------------
 > Server -> smtp.mydomain.com
 > Port -> 25
 > Your email -> myemail@mydomain.com
@@ -57,8 +56,11 @@ When you first run *gxmail.py* it will prompt you to create your default profile
 Each profile is stored as a text file inside *~/.gxmail*
 You can simply delete each file to remove a profile.
 It is also posible to edit them with your favorite text editor, just remember to keep the structure:
+
 > ["Profilename", "server", "port", "email", "password"]
+
 Example:
+
 > ["default", "smtp.mydomain.com", "25", "myemail@mydomain.com", "myPa$$w0rd"]
 
 # License
