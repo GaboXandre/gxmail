@@ -1,6 +1,4 @@
 # GXMAIL v1.0.0  
-tst
-
 
 *gxmail* is a simple smtp client designed to send emails from the linux command line.
 It is particularly useful to use with bash scripts. 
