@@ -118,7 +118,7 @@ v1.1.1
 * Add batch mode, read recepients form text file
 
 v1.1.2 
-* Add sopport for html
+* Add support for html
 * Fixed bug on interactive profile selection
 
 v1.1.3
