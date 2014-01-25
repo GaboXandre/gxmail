@@ -10,7 +10,7 @@ import simplejson as json # to profiled stored in json files
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.2[beta]',
+			'Version' : '1.1.2',
 			'Author' : 'Gabriel Godoy',
 			'License' : 'GPL3',
 			'copyright' : '2014 Gabriel Godoy'
@@ -26,6 +26,7 @@ parser.add_argument('-to', help='Receipient. You may include several email addre
 parser.add_argument('-s', '--subject', help='subject line.', required=False)
 parser.add_argument('-m', '--message', help='Import email body from text file.', required=False)
 parser.add_argument('-b', '--batch', help='Batch mode: get recepients from a text file.', required=False)
+parser.add_argument('-html', '--html', help='HTML mode: send html formated content.', required=False, action="store_true")
 args = parser.parse_args()
 
 
@@ -70,15 +71,20 @@ def test_profiles():
 
 
 def test_options():
-	values = [args.profile, args.to, args.subject, args.message]
+	values = [args.profile, args.to, args.subject, args.message, 'text']
 	p = select_profile(values[0])
 	t = str(args.to)
 	s = str(args.subject)
 	m = str(args.message)
 	b = str(args.batch)
+	h = args.html
 	
 	int_mode = 'off'
-
+	if h is True:
+		values[4] = 'text/html'
+	else:
+		values[4] = 'text'
+	
 	if t == 'None':
 		values[1] = 0
 		int_mode = 'on'
@@ -90,14 +96,14 @@ def test_options():
 		int_mode = 'on'
 
 	if b != 'None':
-		values = [p, args.to, args.subject, args.message]
+		values = [p, args.to, args.subject, args.message, values[4]]
 		int_mode = 'off'
 		batch_mode(values)
-
+		
 	if int_mode == 'on':
 		interactive_mode(values)
 	else:
-		values = [p, args.to, args.subject, args.message]
+		values = [p, args.to, args.subject, args.message, values[4]]
 		send_mail(values)
 
 
@@ -113,9 +119,13 @@ def interactive_mode(values):
 			profile[0] = 'default'
 		else:
 			profile[0] = p
-		select_profile(profile[0])
-		values[0] = profile
-
+		values[0] = select_profile(str(profile[0]))
+	if args.html is False:
+		h = raw_input('MIME (text or html): ')
+		if h == 'html':
+			values[4] = 'text/html'
+		else:
+			values[4] = 'text'
 	if values[1] == 0:
 		t = raw_input('To: ')
 		values[1] = t
@@ -127,7 +137,7 @@ def interactive_mode(values):
 		values[3] = str(m)
 
 	send_mail(values)
-	print 'email sent to: '+str(values[1])
+
 
 def batch_mode(values):
 	# a. get file
@@ -182,9 +192,10 @@ def send_mail(values):
     to_email = values[1] #args.to
     from_email = profile[3]
     subject = values[2] #args.subject
+    content_type = values[4]
     
     # parse message from text file
-    header = "To:%s\nFrom:%s\nSubject:%s \n" % (to_email, from_email, subject)
+    header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nContent-type: %s\nSubject:%s \n" % (to_email, from_email, content_type, subject)
 	
 	# extract message content from file
     file_name = values[3] #args.message
@@ -197,6 +208,14 @@ def send_mail(values):
     smtpserver.sendmail(from_email, to_email, content)
     smtpserver.close()
     
+    #Print useful info
+    print '='*80
+    print 'e-mail sent'
+    print '='*80
+    print header
+    print '-'*80
+    print msg
+    print '='*80
     
 print '='*80
 print 'gxmail - version %s' %(AppInfo['Version'])

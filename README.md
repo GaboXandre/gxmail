@@ -29,6 +29,7 @@ The following options are available
                         
   -m MESSAGE, --message MESSAGE
                         Import email body from text file.
+  -html                 Sends email in html format
 
 ## Interactive Mode
 
@@ -90,6 +91,12 @@ This software is realeased under GPL3.
 email: gabo.xandre@gmail.com
 
 # ChangeLog
-v1.1.0 Adds interactive mode
+v1.1.0 
+* Adds interactive mode
 
-v1.1.1 Adds batch mode, reads recepients form text file
+v1.1.1 
+* Adds batch mode, reads recepients form text file
+
+v1.1.2 
+* Adds html support
+* Fixed bug on interactive profile selection
