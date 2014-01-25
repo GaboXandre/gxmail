@@ -10,7 +10,7 @@ import simplejson as json # to profiled stored in json files
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.2',
+			'Version' : '1.1.3',
 			'Author' : 'Gabriel Godoy',
 			'License' : 'GPL3',
 			'copyright' : '2014 Gabriel Godoy'
@@ -20,13 +20,14 @@ FileLocations = { 'ProfileDir' : os.path.expanduser('~/.gxmail/')}
 
 
 # Command Line Flags and options
-parser = argparse.ArgumentParser(description='%s is a simple text smpt client to send email from the command line. Very useful for scripts.' %(AppInfo['AppName']))
+parser = argparse.ArgumentParser(description='%s is a simple text smpt client to send email from the command line. Very useful for scripts. If called without parameters, it starts in interactive mode.' %(AppInfo['AppName']))
 parser.add_argument('-p', '--profile', help='Select profile to be used.', required=False)
 parser.add_argument('-to', help='Receipient. You may include several email addresses separating them with a comma. DO NOT use spaces', required=False)
 parser.add_argument('-s', '--subject', help='subject line.', required=False)
 parser.add_argument('-m', '--message', help='Import email body from text file.', required=False)
 parser.add_argument('-b', '--batch', help='Batch mode: get recepients from a text file.', required=False)
 parser.add_argument('-html', '--html', help='HTML mode: send html formated content.', required=False, action="store_true")
+parser.add_argument('-v', '--version', help='Prints version and exits program.', required=False, action="store_true")
 args = parser.parse_args()
 
 
@@ -78,12 +79,14 @@ def test_options():
 	m = str(args.message)
 	b = str(args.batch)
 	h = args.html
-	
+	v = args.version
+ 	
 	int_mode = 'off'
+		
 	if h is True:
 		values[4] = 'text/html'
 	else:
-		values[4] = 'text'
+		values[4] = 'text/plain'
 	
 	if t == 'None':
 		values[1] = 0
@@ -193,9 +196,10 @@ def send_mail(values):
     from_email = profile[3]
     subject = values[2] #args.subject
     content_type = values[4]
+    xmailer = AppInfo['AppName']+'-v'+AppInfo['Version']
     
     # parse message from text file
-    header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nContent-type: %s\nSubject:%s \n" % (to_email, from_email, content_type, subject)
+    header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nContent-type: %s\nX-Mailer: %s\nSubject:%s \n" % (to_email, from_email, content_type, xmailer, subject)
 	
 	# extract message content from file
     file_name = values[3] #args.message
@@ -216,7 +220,13 @@ def send_mail(values):
     print '-'*80
     print msg
     print '='*80
-    
+
+
+if args.version is True:
+	version_info = AppInfo['AppName']+'-v'+AppInfo['Version']
+	print version_info
+	quit()
+	    
 print '='*80
 print 'gxmail - version %s' %(AppInfo['Version'])
 print '='*80

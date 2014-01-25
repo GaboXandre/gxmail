@@ -1,4 +1,4 @@
-# GXMAIL v1.1.2
+# GXMAIL v1.1.3
 
 *gxmail* is a simple smtp client designed to send emails from the linux command line.
 It is particularly useful to use with bash scripts. 
@@ -13,27 +13,33 @@ It is particularly useful to use with bash scripts.
 # Usage
 
 ## Options
-The following options are available
-
+The following arguments are available
 
   -h, --help            show this help message and exit
-  
+
   -p PROFILE, --profile PROFILE
                         Select profile to be used.
-                        
+
   -to TO                Receipient. You may include several email addresses
                         separating them with a comma. DO NOT use spaces
-                        
+
   -s SUBJECT, --subject SUBJECT
                         subject line.
-                        
+
   -m MESSAGE, --message MESSAGE
                         Import email body from text file.
-  -html                 Sends email in html format
+
+  -b BATCH, --batch BATCH
+                        Batch mode: get recepients from a text file.
+
+  -html, --html         HTML mode: send html formated content.
+
+  -v, --version         Prints version and exits program.
+
 
 ## Interactive Mode
 
-If called without parameters, *gxmail* will run in interactive mode.
+If called without arguments, *gxmail* will run in interactive mode.
 
 ## Batch mode 
 
@@ -41,7 +47,7 @@ If called without parameters, *gxmail* will run in interactive mode.
 In batch mode, *gxmail* will read a list recepients from a text file.
 *Notes:*
 * The file must be plain text and contain one email per line
-* *batch mode* is NOT compatible with *interactive mode*, you must provide parameters: to, subject, and message. Only the profile may be ommitted, in which case, the default profile is used.
+* *batch mode* is NOT compatible with *interactive mode*, you must provide arguments: to, subject, and message. Only the profile may be ommitted, in which case, the default profile is used.
 
 *Spam is illegal, and it means you are evil if you use this software for that purpose.*
 
@@ -92,11 +98,15 @@ email: gabo.xandre@gmail.com
 
 # ChangeLog
 v1.1.0 
-* Adds interactive mode
+* Add interactive mode
 
 v1.1.1 
-* Adds batch mode, reads recepients form text file
+* Add batch mode, read recepients form text file
 
 v1.1.2 
-* Adds html support
+* Add sopport for html
 * Fixed bug on interactive profile selection
+
+v1.1.3
+* Adds *--version* flag
+* Fix 'text/plain' Mime-type
