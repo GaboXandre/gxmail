@@ -17,7 +17,7 @@ It is particularly useful to use with bash scripts.
 
 ## Options
 The following arguments are available
-'''
+```
   -h, --help            show this help message and exit
 
   -p PROFILE, --profile PROFILE
@@ -38,7 +38,7 @@ The following arguments are available
   -html, --html         HTML mode: send html formated content.
 
   -v, --version         Prints version and exits program.
-'''
+```
 
 ## Interactive Mode
 
@@ -72,14 +72,14 @@ In batch mode, *gxmail* will read a list recepients from a text file.
 
 ## First Run
 When you first run *gxmail.py* it will prompt you to create your default profile:
-'''
+```
  You don't have a profile set up yet. Let's do it now!
  Server -> smtp.mydomain.com
  Port -> 25
  Your email -> myemail@mydomain.com
  Your password -> myPa$$w0rd
  You are ready to send emails with your new profile!
-'''
+```
 ## Profile Management
 Each profile is stored as a text file inside *~/.gxmail*
 You can simply delete each file to remove a profile.
