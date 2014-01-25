@@ -10,7 +10,7 @@ import simplejson as json # to profiled stored in json files
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.3',
+			'Version' : '1.1.4[dev]',
 			'Author' : 'Gabriel Godoy',
 			'License' : 'GPL3',
 			'copyright' : '2014 Gabriel Godoy'
@@ -97,6 +97,8 @@ def test_options():
 	if m == 'None':
 		values[3] = 'empty'
 		int_mode = 'on'
+	else:
+		values[3] = os.path.expanduser(values[3])
 
 	if b != 'None':
 		values = [p, args.to, args.subject, args.message, values[4]]
@@ -128,7 +130,7 @@ def interactive_mode(values):
 		if h == 'html':
 			values[4] = 'text/html'
 		else:
-			values[4] = 'text'
+			values[4] = 'text/plain'
 	if values[1] == 0:
 		t = raw_input('To: ')
 		values[1] = t
@@ -137,6 +139,7 @@ def interactive_mode(values):
 		values[2] = s
 	if values[3] == 'empty':
 		m = raw_input('Body File Path: ')
+		m = os.path.expanduser(m) 
 		values[3] = str(m)
 
 	send_mail(values)
