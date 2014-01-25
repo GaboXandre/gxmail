@@ -7,8 +7,11 @@ It is particularly useful to use with bash scripts.
 # Features
 * smtp
 * multiple profiles
-* multiple recepients
 * load email body from file
+* html support
+* batch mode to enable mailing lists
+* interactive mode
+
 
 # Usage
 
