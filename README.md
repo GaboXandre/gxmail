@@ -62,10 +62,13 @@ In batch mode, *gxmail* will read a list recepients from a text file.
 
 * Copy *gxmail.py* to your desired application.
 * *gxmail* will store profiles in *~/.gxmail*, you will need to create this directory manually. And keep it empty, do **NOT** place *gxmail.py* inside it.
+
     mkdir ~/.gxmail
 * Make sure *gxmail.py* is executable
+
     chmod +x <path>/gxmail.py
 * Run the script, you will be prompted to create your default profile.
+
     ./gxmail.py
 
 # Profiles
