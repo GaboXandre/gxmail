@@ -7,10 +7,11 @@ import sys
 import os
 import argparse #for command line options/flags
 import simplejson as json # to profiled stored in json files
+import base64 # used for attachments
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.4[dev]',
+			'Version' : '1.1.4',
 			'Author' : 'Gabriel Godoy',
 			'License' : 'GPL3',
 			'copyright' : '2014 Gabriel Godoy'
@@ -28,9 +29,8 @@ parser.add_argument('-m', '--message', help='Import email body from text file.',
 parser.add_argument('-b', '--batch', help='Batch mode: get recepients from a text file.', required=False)
 parser.add_argument('-html', '--html', help='HTML mode: send html formated content.', required=False, action="store_true")
 parser.add_argument('-v', '--version', help='Prints version and exits program.', required=False, action="store_true")
+parser.add_argument('-a', '--attachment', help='Send file attachment.', required=False)
 args = parser.parse_args()
-
-
 
 # PROFILE MANAGEMENT SECTION
 def create_profile(defprofile):
@@ -72,7 +72,7 @@ def test_profiles():
 
 
 def test_options():
-	values = [args.profile, args.to, args.subject, args.message, 'text']
+	values = [args.profile, args.to, args.subject, args.message, 'text/plain', args.attachment]
 	p = select_profile(values[0])
 	t = str(args.to)
 	s = str(args.subject)
@@ -80,14 +80,19 @@ def test_options():
 	b = str(args.batch)
 	h = args.html
 	v = args.version
- 	
+ 	a = str(args.attachment)	
+
 	int_mode = 'off'
 		
 	if h is True:
 		values[4] = 'text/html'
 	else:
 		values[4] = 'text/plain'
-	
+	if a != 'None':
+		a = os.path.expanduser(a) 
+		values[5] = a
+	else:
+		values[5] = 'empty'	
 	if t == 'None':
 		values[1] = 0
 		int_mode = 'on'
@@ -101,14 +106,14 @@ def test_options():
 		values[3] = os.path.expanduser(values[3])
 
 	if b != 'None':
-		values = [p, args.to, args.subject, args.message, values[4]]
+		values = [p, args.to, args.subject, args.message, values[4], values[5]]
 		int_mode = 'off'
 		batch_mode(values)
 		
 	if int_mode == 'on':
 		interactive_mode(values)
 	else:
-		values = [p, args.to, args.subject, args.message, values[4]]
+		values = [p, args.to, args.subject, args.message, values[4], values[5]]
 		send_mail(values)
 
 
@@ -141,6 +146,10 @@ def interactive_mode(values):
 		m = raw_input('Body File Path: ')
 		m = os.path.expanduser(m) 
 		values[3] = str(m)
+	if values[5] == 'empty':
+		a = raw_input('Attachment: ')
+		a = os.path.expanduser(a)
+		values[5] = str(a) 
 
 	send_mail(values)
 
@@ -199,11 +208,16 @@ def send_mail(values):
     from_email = profile[3]
     subject = values[2] #args.subject
     content_type = values[4]
+    attachment = values[5]
     xmailer = AppInfo['AppName']+'-v'+AppInfo['Version']
     
     # parse message from text file
     header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nContent-type: %s\nX-Mailer: %s\nSubject:%s \n" % (to_email, from_email, content_type, xmailer, subject)
 	
+    # attachment
+    attachment_name = values[5]
+    
+
 	# extract message content from file
     file_name = values[3] #args.message
     the_file = open(file_name)
@@ -211,9 +225,9 @@ def send_mail(values):
     the_file.close()
 
     content = header + "\n" + msg
-    smtpserver = initialize_smtp_server(profile)
-    smtpserver.sendmail(from_email, to_email, content)
-    smtpserver.close()
+#    smtpserver = initialize_smtp_server(profile)
+#    smtpserver.sendmail(from_email, to_email, content)
+#    smtpserver.close()
     
     #Print useful info
     print '='*80
