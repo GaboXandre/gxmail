@@ -12,9 +12,9 @@ import base64 # used for attachments
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
 			'Version' : '1.1.5',
-			'Author' : 'Gabriel Godoy',
+			'Author' : 'GaboXandre',
 			'License' : 'GPL3',
-			'copyright' : '2014 Gabriel Godoy'
+			'copyright' : '2014 GaboXandre'
 			}
 
 FileLocations = { 'ProfileDir' : os.path.expanduser('~/.gxmail/')}
@@ -208,7 +208,6 @@ def send_mail(values):
     from_email = profile[3]
     subject = values[2] #args.subject
     content_type = values[4]
-    attachment = values[5]
     xmailer = AppInfo['AppName']+'-v'+AppInfo['Version']
     marker = '2325769521'
     marker2 = '2325478522'
@@ -221,31 +220,36 @@ def send_mail(values):
     msg = the_file.read()
     the_file.close()
     
-    # attachment
-    '''
-    attachment_name = values[5]
-    extract = open(attachment_name, 'rb')
-    attachment = extract.read()
-    encoded_attachment = base64.b64encode(attachment)
-    '''
-    attachment_name = values[5]
-    extract = open(attachment_name, 'r')
-    encoded_attachment = extract.read()
-    
-    
-    #Main Header
-    header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nX-Mailer: %s\nSubject:%s \nContent-Type: multipart/mixed; boundary=%s\n--%s\nContent-type: %s\nContent-Transfer-Encoding:8bit\n" % (to_email, from_email, xmailer, subject, marker, marker, content_type)
-    
+    if values[5] == 'empty':
+    	 # parse message from text file
+    	header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nContent-type: %s\nX-Mailer: %s\nSubject:%s \n" % (to_email, from_email, content_type, xmailer, subject)
+    	
+    	content = header + "\n" + msg
+    	
+    else:
+		# attachment
+		'''
+		attachment_name = values[5]
+		extract = open(attachment_name, 'rb')
+		attachment = extract.read()
+		encoded_attachment = base64.b64encode(attachment)
+		'''
+		attachment_name = values[5]
+		extract = open(attachment_name, 'r')
+		encoded_attachment = extract.read()
+		
+		
+		#Main Header
+		header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nX-Mailer: %s\nSubject:%s \nContent-Type: multipart/mixed; boundary=%s\n--%s\nContent-type: %s\nContent-Transfer-Encoding:8bit\n" % (to_email, from_email, xmailer, subject, marker, marker, content_type)
 
-    
-    after_body = '--%s' %(marker)
-    
-    # attachment header
-    #attachment_header = 'Content-Type: multipart/mixed; name=\"%s\"\nContent-Transfer-Encoding:base64\nContent-Disposition: attachment; filename=%s\n\n%s\n--%s--' %(attachment_name, attachment_name, encoded_attachment, marker)
-    
-    attachment_header = 'Content-Type: text/plain; name=\"%s\"\nContent-Disposition: attachment; filename=%s\n\n%s\n--%s--' %(attachment_name, attachment_name, encoded_attachment, marker)
+		after_body = '--%s' %(marker)
+		
+		# attachment header
+		attachment_header = 'Content-Type: text/plain; name=\"%s\"\nContent-Disposition: attachment; filename=%s\n\n%s\n--%s--' %(attachment_name, attachment_name, encoded_attachment, marker)
 
-    content = header + "\n" + msg +"\n"+after_body+'\n'+attachment_header
+		content = header + "\n" + msg +"\n"+after_body+'\n'+attachment_header
+    
+    
     smtpserver = initialize_smtp_server(profile)
     smtpserver.sendmail(from_email, to_email, content)
     smtpserver.close()
