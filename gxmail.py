@@ -2,12 +2,11 @@
 ###############################################################
 # LOGIC MODULE
 ###############################################################
-import smtplib # for smtp support
+import smtplib 
 import sys
 import os
-import argparse #for command line options/flags
-import simplejson as json # to profiled stored in json files
-import base64 # used for attachments
+import argparse 
+import simplejson as json 
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
