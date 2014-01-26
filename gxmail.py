@@ -228,12 +228,6 @@ def send_mail(values):
     	
     else:
 		# attachment
-		'''
-		attachment_name = values[5]
-		extract = open(attachment_name, 'rb')
-		attachment = extract.read()
-		encoded_attachment = base64.b64encode(attachment)
-		'''
 		attachment_name = values[5]
 		extract = open(attachment_name, 'r')
 		encoded_attachment = extract.read()
