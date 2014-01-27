@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ###############################################################
-# LOGIC MODULE
+# GXMAIL - COMMAND LINE SMTP USER AGENT
 ###############################################################
 import smtplib 
 import sys
