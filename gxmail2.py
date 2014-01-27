@@ -138,6 +138,10 @@ def interactive_mode():
 	else:	
 		arguments.append(str(p))
 	h = raw_input('MIME (text or html): ')
+	if h == 'html':
+		h = 'text/html'
+	else:
+		h = 'text/plain'
 	t = raw_input('To: ')
 	s = raw_input('Subject: ')
 	m = raw_input('Body File Path: ')
@@ -187,8 +191,12 @@ def interactive_mode():
 	############################################
 	# 3. Send email
 	############################################
-
-	send_mail()
+	arguments.append(False)
+	arguments.append('None')
+	arguments.append(False)
+	print 'email will be sent with this info: '
+	print arguments
+	send_mail(arguments)
 
 
 	
@@ -273,6 +281,8 @@ def test_options(arguments):
 	######################################################	
 	# 3. READY TO SEND EMAIL
 	######################################################	
+	print 'email will be sent with this info: '
+	print arguments
 	send_mail(arguments)
 	
 
