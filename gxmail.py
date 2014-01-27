@@ -259,12 +259,26 @@ def send_mail(values):
 		
 		
 		#Main Header
-		header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nX-Mailer: %s\nSubject:%s \nContent-Type: multipart/mixed; boundary=%s\n--%s\nContent-type: %s\nContent-Transfer-Encoding:8bit\n" % (to_email, from_email, xmailer, subject, marker, marker, content_type)
+		header = """
+		To:%s\n
+		From:%s\n
+		MIME-Version: 1.0\n
+		X-Mailer: %s\n
+		Subject:%s \n
+		Content-Type: multipart/mixed; boundary=%s\n
+		--%s\n
+		Content-type: %s\n
+		Content-Transfer-Encoding:8bit\n""" % (to_email, from_email, xmailer, subject, marker, marker, content_type)
 
 		after_body = '--%s' %(marker)
 		
 		# attachment header
-		attachment_header = 'Content-Type: text/plain; name=\"%s\"\nContent-Disposition: attachment; filename=%s\n\n%s\n--%s--' %(attachment_name, attachment_name, encoded_attachment, marker)
+		attachment_header = '''
+		Content-Type: text/plain; 
+		name=\"%s\"\n
+		Content-Disposition: attachment; filename=%s\n\n
+		%s\n
+		--%s--''' %(attachment_name, attachment_name, encoded_attachment, marker)
 
 		content = header + "\n" + msg +"\n"+after_body+'\n'+attachment_header
     
