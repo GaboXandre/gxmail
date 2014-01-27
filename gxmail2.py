@@ -110,15 +110,60 @@ def batch_mode():
 	print 'you are now in batch mode...'
 
 def interactive_mode():
-	print 'you are now in interactive mode...'
+	print '-'*80
+	print 'Interactive Mode'
+	print '-'*80
+	############################################
+	# 0. Start the list with no values
+	############################################
+	global arguments
+	arguments = []
+	print arguments
 
-def test_options():
-	###############
-	print arguments  # DEBUG INFO
+	############################################
+	# 1. Get main input
+	############################################
+	p = raw_input('Profile (default): ')
+	print p
+	if p == '':
+		arguments.append('None')
+	else:	
+		arguments.append(str(p))
+	h = raw_input('MIME (text or html): ')
+	t = raw_input('To: ')
+	s = raw_input('Subject: ')
+	m = raw_input('Body File Path: ')
+		 
 	
-	######################################################	
-	# 1. Select Profile
-	######################################################	
+	############################################
+	# 2. Start the list
+	# [0-profile, 1-to, 2-subject, 3-message, 4-text/html, 5-attachment, 6-interactive, 7-batch, 8-version ]
+	############################################
+
+	arguments.append(str(t))
+	arguments.append(str(s))
+	arguments.append(os.path.expanduser(m))
+	arguments.append(h)
+	
+	
+	############################################
+	# 3. Attachment?
+	############################################
+	question = raw_input('Include attachment?(y/n)-> ')
+	if question == 'y':
+		a = raw_input('Attachment: ')
+		a = os.path.expanduser(a)
+		arguments.append(os.path.expanduser(a))
+	else:
+		a = 'None'
+		arguments.append(str(a))
+	
+	############################################
+	# 3. Get profile info
+	# Note this seciton is copy paste from select_profile
+	# Shame on me !!!!! 
+	############################################
+	
 	profile = str(arguments[0])
 	if profile == 'None':
 		profile_name = 'default'
@@ -132,7 +177,18 @@ def test_options():
 	arguments[0] = profile
 	
 	############################################
-	# 2. Check general options
+	# 3. Send email
+	############################################
+	
+	
+
+
+def test_options():
+	###############
+	print arguments  # DEBUG INFO
+	
+	############################################
+	# 1. Check general options
 	# 	a. version
 	#	b. interactive
 	#	c. batch
@@ -155,7 +211,7 @@ def test_options():
 		quit()
 	
 	######################################################	
-	# 3. Check email option and pass them to send_email()
+	# 2. Check email option and pass them to send_email()
 	#	1. to
 	#	2. subject
 	#	3. message
@@ -190,7 +246,7 @@ def test_options():
 	
 	
 	######################################################	
-	# 4. READY TO SEND EMAIL
+	# 3. READY TO SEND EMAIL
 	######################################################	
 	send_mail()
 	
@@ -207,6 +263,22 @@ def create_profile(defprofile):
 	except Exception:
 		print 'Error: Default profile could not be created. Sorry.'
 		quit()
+
+def select_profile():
+	######################################################	
+	# Select Profile
+	######################################################	
+	profile = str(arguments[0])
+	if profile == 'None':
+		profile_name = 'default'
+	else:
+		profile_name = profile
+	profile_location = FileLocations['ProfileDir']+profile_name
+	# load profile info
+	myfile = open(profile_location)
+	myfile2 = myfile.read()
+	profile = json.loads(myfile2)
+	arguments[0] = profile
 
 def test_profiles():
 	###############
