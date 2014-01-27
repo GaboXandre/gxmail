@@ -30,11 +30,11 @@ import os
 import argparse 
 import simplejson as json 
 
-def initialize_smtp_server(arguments):
-	server = arguments[0][0]
-	port = arguments[0][1]
-	email = arguments[0][2]
-	password = arguments[0][3]
+def initialize_smtp_server():
+	server = arguments[0][1]
+	port = arguments[0][2]
+	email = arguments[0][3]
+	password = arguments[0][4]
 	smtpserver = smtplib.SMTP(server, port)
 	smtpserver.ehlo()
 	smtpserver.starttls()
@@ -54,30 +54,70 @@ def send_mail():
 	xmailer = AppInfo['AppName']+'-v'+AppInfo['Version']
 	attachment = str(arguments[5])
 	
+	######################################################	
+	# 2. Extract message from file
 	######################################################
-	# 2a. Send email without attachment
+	file_name = arguments[3] #args.message
+	the_file = open(file_name)
+	msg = the_file.read()
+	the_file.close()
+	######################################################
+	# 3a. Prepare email without attachment
 	######################################################
 	if attachment == 'None':
-		print 'email will be sent without attachment.'
+
 		# parse message from text file
 		header = "To:%s\nFrom:%s\nSubject:%s \n" % (to_email, from_email, subject)
 		
-		# extract message content from file
-		file_name = arguments[3] #args.message
-		the_file = open(file_name)
-		msg = the_file.read()
-		the_file.close()
-
-		content = header + "\n" + msg
-		smtpserver = initialize_smtp_server(arguments)
-		smtpserver.sendmail(from_email, to_email, content)
-		smtpserver.close()
+		
 	######################################################
-	# 2b. Send email with attachment
+	# 3b. Prepare email with attachment
 	######################################################	
 	else:
 		print 'email will be sent with attachment.'
+		marker = '2325769521'
+		
+		# prepare attachment
+		attachment_name = arguments[5]
+		extract = open(attachment_name, 'r')
+		encoded_attachment = extract.read()
+		
+		#Main Header
+		header = """
+To:%s
+From:%s
+MIME-Version: 1.0
+X-Mailer: %s
+Subject:%s 
+Content-Type: multipart/mixed; boundary=%s
+--%s
+Content-type: %s
+Content-Transfer-Encoding:8bit""" % (to_email, from_email, xmailer, subject, marker, marker, mime_type)
 
+		after_body = '--%s' %(marker)
+		
+		# attachment header
+		attachment_header = """
+Content-Type: text/plain; 
+name=\"%s\"
+Content-Disposition: attachment; filename=%s
+%s
+--%s--""" %(attachment_name, attachment_name, encoded_attachment, marker)
+
+		content = header + "\n" + msg +"\n"+after_body+'\n'+attachment_header
+
+	######################################################
+	# 4. Send email 
+	######################################################
+	
+	content = header + "\n" + msg
+	smtpserver = initialize_smtp_server()
+	smtpserver.sendmail(from_email, to_email, content)
+	smtpserver.close()
+	
+	print arguments
+	print 'server -> '+arguments[0][0]+':'+arguments[0][2]
+	
 def batch_mode():
 	print 'you are now in batch mode...'
 
