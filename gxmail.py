@@ -1,7 +1,29 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 ###############################################################
 # GXMAIL - COMMAND LINE SMTP USER AGENT
 ###############################################################
+#
+#  gxmail.py
+#  
+#  Copyright 2014 GaboXandre <gabo.xandre@gmail.com>
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#  
+#  
 import smtplib 
 import sys
 import os
@@ -19,7 +41,7 @@ AppInfo = { 'AppName' : 'gxmail',
 FileLocations = { 'ProfileDir' : os.path.expanduser('~/.gxmail/')}
 
 
-# Command Line Flags and options
+# Command Line Arguments
 parser = argparse.ArgumentParser(description='%s is a simple text smpt client to send email from the command line. Very useful for scripts. If called without parameters, it starts in interactive mode.' %(AppInfo['AppName']))
 parser.add_argument('-p', '--profile', help='Select profile to be used.', required=False)
 parser.add_argument('-to', help='Receipient. You may include several email addresses separating them with a comma. DO NOT use spaces', required=False)
