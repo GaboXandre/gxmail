@@ -30,7 +30,7 @@ import os
 import argparse 
 import simplejson as json 
 
-def initialize_smtp_server():
+def initialize_smtp_server(arguments):
 	server = arguments[0][1]
 	port = arguments[0][2]
 	email = arguments[0][3]
@@ -42,7 +42,7 @@ def initialize_smtp_server():
 	smtpserver.login(email, password)
 	return smtpserver
 
-def send_mail():
+def send_mail(arguments):
 	print 'ready to send email'
 	######################################################	
 	# 1. Common Variables
@@ -95,6 +95,7 @@ def send_mail():
 	######################################################
 	# 4. Send email 
 	######################################################
+	'''
 	try:
 		smtpserver = initialize_smtp_server()
 		smtpserver.sendmail(from_email, to_email, content)
@@ -102,9 +103,16 @@ def send_mail():
 		print 'email sent successfully!'
 	except Exception:
 		print 'Opps, the email could not be sent.'
-	
+	'''
 	print arguments
 	print 'server -> '+arguments[0][0]+':'+arguments[0][2]
+	
+	smtpserver = initialize_smtp_server(arguments)
+	smtpserver.sendmail(from_email, to_email, content)
+	smtpserver.close()
+	print 'email sent successfully!'
+	
+	
 	
 def batch_mode():
 	print 'you are now in batch mode...'
@@ -179,11 +187,14 @@ def interactive_mode():
 	############################################
 	# 3. Send email
 	############################################
+
 	send_mail()
+
+
 	
 
 
-def test_options():
+def test_options(arguments):
 	###############
 	print arguments  # DEBUG INFO
 	######################################################	
@@ -262,7 +273,7 @@ def test_options():
 	######################################################	
 	# 3. READY TO SEND EMAIL
 	######################################################	
-	send_mail()
+	send_mail(arguments)
 	
 
 def create_profile(defprofile):
@@ -341,10 +352,12 @@ def main():
 	print 'gxmail - version %s' %(AppInfo['Version'])
 	print '='*80
 	
+	return arguments
+	
 		
 
 if __name__ == '__main__':
 	main()
 	test_profiles()
-	test_options()
+	test_options(arguments)
 
