@@ -30,29 +30,95 @@ import os
 import argparse 
 import simplejson as json 
 
+def initialize_smtp_server(arguments):
+	server = arguments[0][0]
+	port = arguments[0][1]
+	email = arguments[0][2]
+	password = arguments[0][3]
+	smtpserver = smtplib.SMTP(server, port)
+	smtpserver.ehlo()
+	smtpserver.starttls()
+	smtpserver.ehlo()
+	smtpserver.login(email, password)
+	return smtpserver
+
+def send_mail():
+	print 'ready to send email'
+	######################################################	
+	# 1. Common Variables
+	######################################################
+	to_email = arguments[1]
+	from_email = arguments[0][3]
+	subject = arguments[2]
+	mime_type = arguments[4]
+	xmailer = AppInfo['AppName']+'-v'+AppInfo['Version']
+	attachment = str(arguments[5])
+	
+	######################################################
+	# 2a. Send email without attachment
+	######################################################
+	if attachment == 'None':
+		print 'email will be sent without attachment.'
+		# parse message from text file
+		header = "To:%s\nFrom:%s\nSubject:%s \n" % (to_email, from_email, subject)
+		
+		# extract message content from file
+		file_name = arguments[3] #args.message
+		the_file = open(file_name)
+		msg = the_file.read()
+		the_file.close()
+
+		content = header + "\n" + msg
+		smtpserver = initialize_smtp_server(arguments)
+		smtpserver.sendmail(from_email, to_email, content)
+		smtpserver.close()
+	######################################################
+	# 2b. Send email with attachment
+	######################################################	
+	else:
+		print 'email will be sent with attachment.'
+
+def batch_mode():
+	print 'you are now in batch mode...'
+
 def interactive_mode():
 	print 'you are now in interactive mode...'
 
 def test_options():
 	###############
 	print arguments  # DEBUG INFO
+	
+	######################################################	
+	# 1. Select Profile
+	######################################################	
+	profile = str(arguments[0])
+	if profile == 'None':
+		profile_name = 'default'
+	else:
+		profile_name = profile
+	profile_location = FileLocations['ProfileDir']+profile_name
+	# load profile info
+	myfile = open(profile_location)
+	myfile2 = myfile.read()
+	profile = json.loads(myfile2)
+	arguments[0] = profile
+	
 	############################################
-	# This fuction is the key to determine flow.
-	# 1. Check general options
+	# 2. Check general options
 	# 	a. version
 	#	b. interactive
 	#	c. batch
 	############################################ 
 	version = arguments[8]
 	interactive = arguments[6]
-	batch = arguments[7]
+	batch = str(arguments[7])
 	
 	if version is True:
 		version_info = AppInfo['AppName']+'-v'+AppInfo['Version']
 		print version_info
 		quit()
 	
-	if batch is True:
+	if batch != 'None':
 		batch_mode()
 		quit()
 	
@@ -61,12 +127,12 @@ def test_options():
 		quit()
 	
 	######################################################	
-	# 2. Check email option and pass them to send_email()
+	# 3. Check email option and pass them to send_email()
 	#	1. to
 	#	2. subject
 	#	3. message
 	#	4. type: text or html
-	#	5. attachment
+	#	5. attachment #### should t be here?
 	######################################################	
 	to = str(arguments[1])
 	subject = str(arguments[2])
@@ -85,13 +151,21 @@ def test_options():
 	if switch == 'OFF':
 		print 'Sorry, information is missing...\nUse flag -h or --help \nAlso, you may use interactive mode with flag -i or --interactive.'
 		quit()
-	if switch == 'ON':
-		# test for type and attachments...
-		if mime_type is True:
-			arguments[4] = 'text/html'
-		else:
-			arguments[4] = 'text/plain'
-		print arguments
+
+	#switch == 'ON', so we continue testing...
+
+	if mime_type is True:
+		arguments[4] = 'text/html'
+	else:
+		arguments[4] = 'text/plain'
+	print arguments #####################	DEBUG
+	
+	
+	######################################################	
+	# 4. READY TO SEND EMAIL
+	######################################################	
+	send_mail()
+	
 
 def create_profile(defprofile):
 	try:
@@ -140,7 +214,7 @@ def main():
 	global FileLocations
 	global arguments
 	AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.6',
+			'Version' : '1.1.7',
 			'Author' : 'GaboXandre',
 			'License' : 'GPL3',
 			'copyright' : '2014 GaboXandre'
