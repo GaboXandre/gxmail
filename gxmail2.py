@@ -67,8 +67,8 @@ def send_mail():
 	if attachment == 'None':
 
 		# parse message from text file
-		header = "To:%s\nFrom:%s\nSubject:%s \n" % (to_email, from_email, subject)
-		
+		header = "To:%s\nFrom:%s\nSubject:%s\nX-Mailer: %s\nContent-type: %s\n " % (to_email, from_email, subject, xmailer, mime_type)
+		content = header + "\n" + msg
 		
 	######################################################
 	# 3b. Prepare email with attachment
@@ -83,37 +83,25 @@ def send_mail():
 		encoded_attachment = extract.read()
 		
 		#Main Header
-		header = """
-To:%s
-From:%s
-MIME-Version: 1.0
-X-Mailer: %s
-Subject:%s 
-Content-Type: multipart/mixed; boundary=%s
---%s
-Content-type: %s
-Content-Transfer-Encoding:8bit""" % (to_email, from_email, xmailer, subject, marker, marker, mime_type)
+		header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nX-Mailer: %s\nSubject:%s\nContent-Type: multipart/mixed; boundary=%s\n--%s\nContent-type: %s\nContent-Transfer-Encoding:8bit\n" % (to_email, from_email, xmailer, subject, marker, marker, mime_type)
 
 		after_body = '--%s' %(marker)
 		
 		# attachment header
-		attachment_header = """
-Content-Type: text/plain; 
-name=\"%s\"
-Content-Disposition: attachment; filename=%s
-%s
---%s--""" %(attachment_name, attachment_name, encoded_attachment, marker)
+		attachment_header = "Content-Type: text/plain; name=\"%s\"\nContent-Disposition: attachment; filename=%s\n%s\n--%s--" %(attachment_name, attachment_name, encoded_attachment, marker)
 
 		content = header + "\n" + msg +"\n"+after_body+'\n'+attachment_header
-
+		
 	######################################################
 	# 4. Send email 
 	######################################################
-	
-	content = header + "\n" + msg
-	smtpserver = initialize_smtp_server()
-	smtpserver.sendmail(from_email, to_email, content)
-	smtpserver.close()
+	try:
+		smtpserver = initialize_smtp_server()
+		smtpserver.sendmail(from_email, to_email, content)
+		smtpserver.close()
+		print 'email sent successfully!'
+	except Exception:
+		print 'Opps, the email could not be sent.'
 	
 	print arguments
 	print 'server -> '+arguments[0][0]+':'+arguments[0][2]
