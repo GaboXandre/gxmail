@@ -10,7 +10,7 @@ import simplejson as json
 
 # GLOBAL VARIABLES
 AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.5',
+			'Version' : '1.1.6',
 			'Author' : 'GaboXandre',
 			'License' : 'GPL3',
 			'copyright' : '2014 GaboXandre'
@@ -146,9 +146,13 @@ def interactive_mode(values):
 		m = os.path.expanduser(m) 
 		values[3] = str(m)
 	if values[5] == 'empty':
-		a = raw_input('Attachment: ')
-		a = os.path.expanduser(a)
-		values[5] = str(a) 
+		question = raw_input('Include attachment?(y/n)-> ')
+		if question == 'y':
+			a = raw_input('Attachment: ')
+			a = os.path.expanduser(a)
+			values[5] = str(a) 
+		else:
+			values[5] = 'empty'
 
 	send_mail(values)
 
