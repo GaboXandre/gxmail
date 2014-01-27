@@ -179,13 +179,27 @@ def interactive_mode():
 	############################################
 	# 3. Send email
 	############################################
-	
+	send_mail()
 	
 
 
 def test_options():
 	###############
 	print arguments  # DEBUG INFO
+	######################################################	
+	# Select Profile
+	######################################################	
+	profile = str(arguments[0])
+	if profile == 'None':
+		profile_name = 'default'
+	else:
+		profile_name = profile
+	profile_location = FileLocations['ProfileDir']+profile_name
+	# load profile info
+	myfile = open(profile_location)
+	myfile2 = myfile.read()
+	profile = json.loads(myfile2)
+	arguments[0] = profile
 	
 	############################################
 	# 1. Check general options
@@ -264,21 +278,6 @@ def create_profile(defprofile):
 		print 'Error: Default profile could not be created. Sorry.'
 		quit()
 
-def select_profile():
-	######################################################	
-	# Select Profile
-	######################################################	
-	profile = str(arguments[0])
-	if profile == 'None':
-		profile_name = 'default'
-	else:
-		profile_name = profile
-	profile_location = FileLocations['ProfileDir']+profile_name
-	# load profile info
-	myfile = open(profile_location)
-	myfile2 = myfile.read()
-	profile = json.loads(myfile2)
-	arguments[0] = profile
 
 def test_profiles():
 	###############
