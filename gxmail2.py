@@ -43,7 +43,7 @@ def initialize_smtp_server(arguments):
 	return smtpserver
 
 def send_mail(arguments):
-	print 'ready to send email'
+	print 'Sending email ... '
 	######################################################	
 	# 1. Common Variables
 	######################################################
@@ -74,7 +74,6 @@ def send_mail(arguments):
 	# 3b. Prepare email with attachment
 	######################################################	
 	else:
-		print 'email will be sent with attachment.'
 		marker = '2325769521'
 		
 		# prepare attachment
@@ -95,22 +94,18 @@ def send_mail(arguments):
 	######################################################
 	# 4. Send email 
 	######################################################
-	'''
+	
 	try:
-		smtpserver = initialize_smtp_server()
+		smtpserver = initialize_smtp_server(arguments)
 		smtpserver.sendmail(from_email, to_email, content)
 		smtpserver.close()
-		print 'email sent successfully!'
+		print 'e-mail sent successfully to '+str(to_email)
+		print '='*80
 	except Exception:
 		print 'Opps, the email could not be sent.'
-	'''
-	print arguments
-	print 'server -> '+arguments[0][0]+':'+arguments[0][2]
+		print '='*80
 	
-	smtpserver = initialize_smtp_server(arguments)
-	smtpserver.sendmail(from_email, to_email, content)
-	smtpserver.close()
-	print 'email sent successfully!'
+
 	
 	
 	
@@ -132,7 +127,6 @@ def interactive_mode():
 	# 1. Get main input
 	############################################
 	p = raw_input('Profile (default): ')
-	print p
 	if p == '':
 		arguments.append('None')
 	else:	
@@ -194,8 +188,6 @@ def interactive_mode():
 	arguments.append(False)
 	arguments.append('None')
 	arguments.append(False)
-	print 'email will be sent with this info: '
-	print arguments
 	send_mail(arguments)
 
 
@@ -203,8 +195,6 @@ def interactive_mode():
 
 
 def test_options(arguments):
-	###############
-	print arguments  # DEBUG INFO
 	######################################################	
 	# Select Profile
 	######################################################	
@@ -275,14 +265,11 @@ def test_options(arguments):
 		arguments[4] = 'text/html'
 	else:
 		arguments[4] = 'text/plain'
-	print arguments #####################	DEBUG
 	
 	
 	######################################################	
 	# 3. READY TO SEND EMAIL
 	######################################################	
-	print 'email will be sent with this info: '
-	print arguments
 	send_mail(arguments)
 	
 
@@ -301,9 +288,6 @@ def create_profile(defprofile):
 
 
 def test_profiles():
-	###############
-	print arguments  # DEBUG INFO
-	###############
 	
 	f = []
 	for (dirpath, dirnames, filenames) in os.walk(FileLocations['ProfileDir']):
