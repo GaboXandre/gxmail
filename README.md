@@ -1,4 +1,4 @@
-# GXMAIL v1.1.7
+# GXMAIL v1.1.8
 
 *gxmail* is a simple smtp client designed to send emails from the linux command line.
 It is particularly useful to use with bash scripts. 
@@ -141,3 +141,6 @@ v1.1.6
 
 v1.1.7
 * Code cleanup
+
+v1.1.8
+* Settings Mode: manage your profiles from the command line. No more need to edit files manually.

@@ -30,6 +30,57 @@ import os
 import argparse 
 import simplejson as json 
 
+def settings_mode():
+	print 'gxmail v%s Settings' %(AppInfo['Version'])
+	######################################################	
+	# 0. Menu - will repeat until loop is false
+	######################################################
+	loop = True
+	while loop is True:
+		print '-'*80
+		print ' 1 - View profiles'
+		print ' 2 - Add new profile'
+		#print ' 3 - Delete existing profile'
+		#print ' 4 - Edit existing profile'
+		print ' 0 - Exit'
+		print '-'*80
+		
+		MenuOption = raw_input('Enter a selection -> ')
+		print 'you selected '+str(MenuOption)
+		if MenuOption == '1':
+			print ' 1 - View profiles'
+			f = []
+			for (dirpath, dirnames, filenames) in os.walk(FileLocations['ProfileDir']):
+				f.extend(filenames)
+				break
+			print f
+			
+		elif MenuOption == '2':
+			print "Let's create a new profile: "
+			prof_name = raw_input('Profile Name -> ')
+			server = raw_input('Server -> ')
+			port = raw_input('Port -> ')
+			email = raw_input('Your email -> ')
+			password = raw_input('Your password -> ')
+		
+			defprofile = [prof_name]
+			defprofile.append(server)
+			defprofile.append(port)
+			defprofile.append(email)
+			defprofile.append(password)
+			
+			create_profile(defprofile)
+			
+		elif MenuOption == '3':
+			print ' 3 - Delete existing profile'
+		elif MenuOption == '4':
+			print ' 4 - Edit existing profile'
+		elif MenuOption == '0':
+			loop = False
+		else:
+			print 'Sorry, %s is not a valid option.' %(str(MenuOption))
+
+
 def initialize_smtp_server(arguments):
 	server = arguments[0][1]
 	port = arguments[0][2]
@@ -257,6 +308,7 @@ def test_options(arguments):
 	version = arguments[8]
 	interactive = arguments[6]
 	batch = str(arguments[7])
+	settings = arguments[9]
 	
 	if version is True:
 		version_info = AppInfo['AppName']+'-v'+AppInfo['Version']
@@ -273,6 +325,10 @@ def test_options(arguments):
 	
 	if interactive is True:
 		interactive_mode()
+		quit()
+	
+	if settings is True:
+		settings_mode()
 		quit()
 	
 	######################################################	
@@ -317,7 +373,7 @@ def test_options(arguments):
 
 def create_profile(defprofile):
 	try:
-		default_file = FileLocations['ProfileDir']+'/default'
+		default_file = FileLocations['ProfileDir']+'/'+str(defprofile[0])
 		default = open(default_file, 'w')
 			
 		default.write(json.dumps(defprofile))
@@ -360,7 +416,7 @@ def main():
 	global FileLocations
 	global arguments
 	AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.7',
+			'Version' : '1.1.8',
 			'Author' : 'GaboXandre',
 			'License' : 'GPL3',
 			'copyright' : '2014 GaboXandre'
@@ -378,12 +434,13 @@ def main():
 	parser.add_argument('-html', '--html', help='HTML mode: send html formated content.', required=False, action="store_true")
 	parser.add_argument('-v', '--version', help='Prints version and exits program.', required=False, action="store_true")
 	parser.add_argument('-i', '--interactive', help='Runs in interactive mode.', required=False, action="store_true")
+	parser.add_argument('-set', '--settings', help='Access your profile settings.', required=False, action="store_true")
 	parser.add_argument('-a', '--attachment', help='Send file attachment.', required=False)
 	args = parser.parse_args()
 	
 	# list format:
-	# [0-profile, 1-to, 2-subject, 3-message, 4-text/html, 5-attachment, 6-interactive, 7-batch, 8-version ]
-	arguments = [args.profile, args.to, args.subject, args.message, args.html, args.attachment, args.interactive, args.batch, args.version]
+	# [0-profile, 1-to, 2-subject, 3-message, 4-text/html, 5-attachment, 6-interactive, 7-batch, 8-version, 9-settings ]
+	arguments = [args.profile, args.to, args.subject, args.message, args.html, args.attachment, args.interactive, args.batch, args.version, args.settings]
 	
 	
 	return arguments
