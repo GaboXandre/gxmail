@@ -380,6 +380,7 @@ def create_profile(defprofile):
 		default.close()
 		res = 'You are ready to send emails with your new profile!'
 		print res
+		quit()
 	except Exception:
 		print 'Error: Default profile could not be created. Sorry.'
 		quit()
@@ -394,6 +395,7 @@ def test_profiles():
 	length = len(f)
 
 	if length == 0:
+		os.mkdir(FileLocations['ProfileDir'])
 		print '-'*80
 		print "You don't have a profile set up yet. Let's do it now!"
 		print '-'*80
