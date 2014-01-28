@@ -140,4 +140,4 @@ v1.1.6
 * Now attachment is not options in interactive mode
 
 v1.1.7
-* cleaning up the code...
+* Code cleanup

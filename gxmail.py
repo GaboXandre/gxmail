@@ -30,40 +30,307 @@ import os
 import argparse 
 import simplejson as json 
 
-# GLOBAL VARIABLES
-AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.6',
-			'Author' : 'GaboXandre',
-			'License' : 'GPL3',
-			'copyright' : '2014 GaboXandre'
-			}
+def initialize_smtp_server(arguments):
+	server = arguments[0][1]
+	port = arguments[0][2]
+	email = arguments[0][3]
+	password = arguments[0][4]
+	smtpserver = smtplib.SMTP(server, port)
+	smtpserver.ehlo()
+	smtpserver.starttls()
+	smtpserver.ehlo()
+	smtpserver.login(email, password)
+	return smtpserver
 
-FileLocations = { 'ProfileDir' : os.path.expanduser('~/.gxmail/')}
+def send_mail(arguments):
+	print 'Sending email ... '
+	######################################################	
+	# 1. Common Variables
+	######################################################
+	to_email = arguments[1]
+	from_email = arguments[0][3]
+	subject = arguments[2]
+	mime_type = arguments[4]
+	xmailer = AppInfo['AppName']+'-v'+AppInfo['Version']
+	attachment = str(arguments[5])
+	
+	######################################################	
+	# 2. Extract message from file
+	######################################################
+	file_name = arguments[3] #args.message
+	the_file = open(file_name)
+	msg = the_file.read()
+	the_file.close()
+	######################################################
+	# 3a. Prepare email without attachment
+	######################################################
+	if attachment == 'None':
 
-
-# Command Line Arguments
-parser = argparse.ArgumentParser(description='%s is a simple text smpt client to send email from the command line. Very useful for scripts. If called without parameters, it starts in interactive mode.' %(AppInfo['AppName']))
-parser.add_argument('-p', '--profile', help='Select profile to be used.', required=False)
-parser.add_argument('-to', help='Receipient. You may include several email addresses separating them with a comma. DO NOT use spaces', required=False)
-parser.add_argument('-s', '--subject', help='subject line.', required=False)
-parser.add_argument('-m', '--message', help='Import email body from text file.', required=False)
-parser.add_argument('-b', '--batch', help='Batch mode: get recepients from a text file.', required=False)
-parser.add_argument('-html', '--html', help='HTML mode: send html formated content.', required=False, action="store_true")
-parser.add_argument('-v', '--version', help='Prints version and exits program.', required=False, action="store_true")
-parser.add_argument('-a', '--attachment', help='Send file attachment.', required=False)
-args = parser.parse_args()
-
-# PROFILE MANAGEMENT SECTION
-def create_profile(defprofile):
-	default_file = FileLocations['ProfileDir']+'/default'
-	default = open(default_file, 'w')
+		# parse message from text file
+		header = "To:%s\nFrom:%s\nSubject:%s\nX-Mailer: %s\nContent-type: %s\n " % (to_email, from_email, subject, xmailer, mime_type)
+		content = header + "\n" + msg
 		
-	default.write(json.dumps(defprofile))
-	default.close()
-	res = 'You are ready to send emails with your new profile!'
-	return res
+	######################################################
+	# 3b. Prepare email with attachment
+	######################################################	
+	else:
+		marker = '2325769521'
+		
+		# prepare attachment
+		attachment_name = arguments[5]
+		extract = open(attachment_name, 'r')
+		encoded_attachment = extract.read()
+		
+		#Main Header
+		header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nX-Mailer: %s\nSubject:%s\nContent-Type: multipart/mixed; boundary=%s\n--%s\nContent-type: %s\nContent-Transfer-Encoding:8bit\n" % (to_email, from_email, xmailer, subject, marker, marker, mime_type)
+
+		after_body = '--%s' %(marker)
+		
+		# attachment header
+		attachment_header = "Content-Type: text/plain; name=\"%s\"\nContent-Disposition: attachment; filename=%s\n%s\n--%s--" %(attachment_name, attachment_name, encoded_attachment, marker)
+
+		content = header + "\n" + msg +"\n"+after_body+'\n'+attachment_header
+		
+	######################################################
+	# 4. Send email 
+	######################################################
+	
+	try:
+		smtpserver = initialize_smtp_server(arguments)
+		smtpserver.sendmail(from_email, to_email, content)
+		smtpserver.close()
+		print 'e-mail sent successfully to '+str(to_email)
+		print '='*80
+	except Exception:
+		print 'Opps, the email could not be sent.'
+		print '='*80
+	
+
+	
+	
+	
+def batch_mode(arguments):
+	print 'you are now in batch mode...' ##########DEBUG
+	############################################
+	# 0. Prepare arguments
+	############################################
+	mime_type = arguments[4]
+	if mime_type is True:
+		arguments[4] = 'text/html'
+	else:
+		arguments[4] = 'text/plain'
+	
+	
+	############################################
+	# 1. Get the file with emails
+	############################################
+	batch_file_path = str(arguments[7])
+	batch_file = open(os.path.expanduser(batch_file_path)) 
+	
+	############################################
+	# 2. Itirate file to make the list
+	############################################
+	mail_list = []
+	with batch_file as f:
+		for line in f:
+		    x = line.rstrip( )
+		    mail_list.append(x)
+		batch_file.close()
+	
+	############################################
+	# 3. Iterate list and send emails
+	############################################
+	length = len(mail_list)
+	cntr = 0
+	while cntr < length:
+		arguments[1] = mail_list[cntr]
+		send_mail(arguments)
+		#print 'email sent to: '+str(mail_list[cntr])
+		#print '-'*80
+		cntr += 1
+	
+
+def interactive_mode():
+	print '-'*80
+	print 'Interactive Mode'
+	print '-'*80
+	############################################
+	# 0. Start the list with no values
+	############################################
+	global arguments
+	arguments = []
+	print arguments
+
+	############################################
+	# 1. Get main input
+	############################################
+	p = raw_input('Profile (default): ')
+	if p == '':
+		arguments.append('None')
+	else:	
+		arguments.append(str(p))
+	h = raw_input('MIME (text or html): ')
+	if h == 'html':
+		h = 'text/html'
+	else:
+		h = 'text/plain'
+	t = raw_input('To: ')
+	s = raw_input('Subject: ')
+	m = raw_input('Body File Path: ')
+		 
+	
+	############################################
+	# 2. Start the list
+	# [0-profile, 1-to, 2-subject, 3-message, 4-text/html, 5-attachment, 6-interactive, 7-batch, 8-version ]
+	############################################
+
+	arguments.append(str(t))
+	arguments.append(str(s))
+	arguments.append(os.path.expanduser(m))
+	arguments.append(h)
+	
+	
+	############################################
+	# 3. Attachment?
+	############################################
+	question = raw_input('Include attachment?(y/n)-> ')
+	if question == 'y':
+		a = raw_input('Attachment: ')
+		a = os.path.expanduser(a)
+		arguments.append(os.path.expanduser(a))
+	else:
+		a = 'None'
+		arguments.append(str(a))
+	
+	############################################
+	# 3. Get profile info
+	# Note this seciton is copy paste from select_profile
+	# Shame on me !!!!! 
+	############################################
+	
+	profile = str(arguments[0])
+	if profile == 'None':
+		profile_name = 'default'
+	else:
+		profile_name = profile
+	profile_location = FileLocations['ProfileDir']+profile_name
+	# load profile info
+	myfile = open(profile_location)
+	myfile2 = myfile.read()
+	profile = json.loads(myfile2)
+	arguments[0] = profile
+	
+	############################################
+	# 3. Send email
+	############################################
+	arguments.append(False)
+	arguments.append('None')
+	arguments.append(False)
+	send_mail(arguments)
+
+
+	
+
+
+def test_options(arguments):
+	######################################################	
+	# Select Profile
+	######################################################	
+	profile = str(arguments[0])
+	if profile == 'None':
+		profile_name = 'default'
+	else:
+		profile_name = profile
+	profile_location = FileLocations['ProfileDir']+profile_name
+	# load profile info
+	myfile = open(profile_location)
+	myfile2 = myfile.read()
+	profile = json.loads(myfile2)
+	arguments[0] = profile
+	
+	############################################
+	# 1. Check general options
+	# 	a. version
+	#	b. interactive
+	#	c. batch
+	############################################ 
+	version = arguments[8]
+	interactive = arguments[6]
+	batch = str(arguments[7])
+	
+	if version is True:
+		version_info = AppInfo['AppName']+'-v'+AppInfo['Version']
+		print version_info
+		quit()
+	# once version is ruled out comes the welcome to the program.
+	print '='*80
+	print 'gxmail - version %s' %(AppInfo['Version'])
+	print '='*80
+	
+	if batch != 'None':
+		batch_mode(arguments)
+		quit()
+	
+	if interactive is True:
+		interactive_mode()
+		quit()
+	
+	######################################################	
+	# 2. Check email option and pass them to send_email()
+	#	1. to
+	#	2. subject
+	#	3. message
+	#	4. type: text or html
+	#	5. attachment #### should t be here?
+	######################################################	
+	to = str(arguments[1])
+	subject = str(arguments[2])
+	message = str(arguments[3])
+	mime_type = arguments[4]
+	attachment = str(arguments[5])
+	switch = 'ON'
+	# test that all mandatory arguments are included
+	if to == 'None':
+		switch = 'OFF'
+	if subject == 'None':
+		switch = 'OFF'
+	if message == 'None':
+		switch = 'OFF'
+	
+	if switch == 'OFF':
+		print 'Sorry, information is missing...\nUse flag -h or --help \nAlso, you may use interactive mode with flag -i or --interactive.'
+		quit()
+
+	#switch == 'ON', so we continue testing...
+
+	if mime_type is True:
+		arguments[4] = 'text/html'
+	else:
+		arguments[4] = 'text/plain'
+	
+	
+	######################################################	
+	# 3. READY TO SEND EMAIL
+	######################################################	
+	send_mail(arguments)
+	
+
+def create_profile(defprofile):
+	try:
+		default_file = FileLocations['ProfileDir']+'/default'
+		default = open(default_file, 'w')
+			
+		default.write(json.dumps(defprofile))
+		default.close()
+		res = 'You are ready to send emails with your new profile!'
+		print res
+	except Exception:
+		print 'Error: Default profile could not be created. Sorry.'
+		quit()
+
 
 def test_profiles():
+	
 	f = []
 	for (dirpath, dirnames, filenames) in os.walk(FileLocations['ProfileDir']):
 		f.extend(filenames)
@@ -86,226 +353,45 @@ def test_profiles():
 		defprofile.append(password)
 		
 		setup = create_profile(defprofile)
-		
-		
-	else:
-		test_options()
 
-
-def test_options():
-	values = [args.profile, args.to, args.subject, args.message, 'text/plain', args.attachment]
-	p = select_profile(values[0])
-	t = str(args.to)
-	s = str(args.subject)
-	m = str(args.message)
-	b = str(args.batch)
-	h = args.html
-	v = args.version
- 	a = str(args.attachment)	
-
-	int_mode = 'off'
-		
-	if h is True:
-		values[4] = 'text/html'
-	else:
-		values[4] = 'text/plain'
-	if a != 'None':
-		a = os.path.expanduser(a) 
-		values[5] = a
-	else:
-		values[5] = 'empty'	
-	if t == 'None':
-		values[1] = 0
-		int_mode = 'on'
-	if s == 'None':
-		values[2] = 0
-		int_mode = 'on'
-	if m == 'None':
-		values[3] = 'empty'
-		int_mode = 'on'
-	else:
-		values[3] = os.path.expanduser(values[3])
-
-	if b != 'None':
-		values = [p, args.to, args.subject, args.message, values[4], values[5]]
-		int_mode = 'off'
-		batch_mode(values)
-		
-	if int_mode == 'on':
-		interactive_mode(values)
-	else:
-		values = [p, args.to, args.subject, args.message, values[4], values[5]]
-		send_mail(values)
-
-
-def interactive_mode(values):
-	print '-'*80
-	print 'Interactive Mode'
-	print '-'*80
-	profile = select_profile(values[0])
+def main():
 	
-	if profile[0] == 'default':
-		p = raw_input('Profile (default): ')
-		if p == '':
-			profile[0] = 'default'
-		else:
-			profile[0] = p
-		values[0] = select_profile(str(profile[0]))
-	if args.html is False:
-		h = raw_input('MIME (text or html): ')
-		if h == 'html':
-			values[4] = 'text/html'
-		else:
-			values[4] = 'text/plain'
-	if values[1] == 0:
-		t = raw_input('To: ')
-		values[1] = t
-	if values[2] == 0:
-		s = raw_input('Subject: ')
-		values[2] = s
-	if values[3] == 'empty':
-		m = raw_input('Body File Path: ')
-		m = os.path.expanduser(m) 
-		values[3] = str(m)
-	if values[5] == 'empty':
-		question = raw_input('Include attachment?(y/n)-> ')
-		if question == 'y':
-			a = raw_input('Attachment: ')
-			a = os.path.expanduser(a)
-			values[5] = str(a) 
-		else:
-			values[5] = 'empty'
+	global AppInfo
+	global FileLocations
+	global arguments
+	AppInfo = { 'AppName' : 'gxmail',
+			'Version' : '1.1.7',
+			'Author' : 'GaboXandre',
+			'License' : 'GPL3',
+			'copyright' : '2014 GaboXandre'
+			}
 
-	send_mail(values)
-
-
-def batch_mode(values):
-	# a. get file
-	batch_file_path = str(args.batch)
-	batch_file = open(os.path.expanduser(batch_file_path)) 
-	mail_list = []
-	# b. iterate file convert to list
-	with batch_file as f:
-		for line in f:
-		    x = line.rstrip( )
-		    mail_list.append(x)
-		batch_file.close()
-	# b. iterate list and send emails
-	length = len(mail_list)
-	cntr = 0
-	while cntr < length:
-		values[1] = mail_list[cntr]
-		send_mail(values)
-		print 'email sent to: '+str(mail_list[cntr])
-		cntr += 1
-
-def select_profile(profile):
-	profile = str(profile)
-	if profile == 'None':
-		profile_name = 'default'
-	else:
-		profile_name = str(profile)
-	profile_location = FileLocations['ProfileDir']+profile_name
-	# load profile info
-	myfile = open(profile_location)
-	myfile2 = myfile.read()
-	profile = json.loads(myfile2)
-	return profile
+	FileLocations = { 'ProfileDir' : os.path.expanduser('~/.gxmail/')}
 	
-
-
-def initialize_smtp_server(profile):
-    server = profile[1]
-    port = profile[2]
-    email = profile[3]
-    password = profile[4]
-    smtpserver = smtplib.SMTP(server, port)
-    smtpserver.ehlo()
-    smtpserver.starttls()
-    smtpserver.ehlo()
-    smtpserver.login(email, password)
-    return smtpserver
-
-def send_mail(values):
+	# Command Line Arguments
+	parser = argparse.ArgumentParser(description='%s is a simple text smpt client to send email from the command line. Very useful for scripts. If called without parameters, it starts in interactive mode.' %(AppInfo['AppName']))
+	parser.add_argument('-p', '--profile', help='Select profile to be used.', required=False)
+	parser.add_argument('-to', help='Receipient. You may include several email addresses separating them with a comma. DO NOT use spaces', required=False)
+	parser.add_argument('-s', '--subject', help='subject line.', required=False)
+	parser.add_argument('-m', '--message', help='Import email body from text file.', required=False)
+	parser.add_argument('-b', '--batch', help='Batch mode: get recepients from a text file.', required=False)
+	parser.add_argument('-html', '--html', help='HTML mode: send html formated content.', required=False, action="store_true")
+	parser.add_argument('-v', '--version', help='Prints version and exits program.', required=False, action="store_true")
+	parser.add_argument('-i', '--interactive', help='Runs in interactive mode.', required=False, action="store_true")
+	parser.add_argument('-a', '--attachment', help='Send file attachment.', required=False)
+	args = parser.parse_args()
 	
-    profile = values[0]
-    to_email = values[1] #args.to
-    from_email = profile[3]
-    subject = values[2] #args.subject
-    content_type = values[4]
-    xmailer = AppInfo['AppName']+'-v'+AppInfo['Version']
-    marker = '2325769521'
-    marker2 = '2325478522'
-    marker3 = '2325478523'
-    
-
-	# extract message content from file
-    file_name = values[3] #args.message
-    the_file = open(file_name)
-    msg = the_file.read()
-    the_file.close()
-    
-    if values[5] == 'empty':
-    	 # parse message from text file
-    	header = "To:%s\nFrom:%s\nMIME-Version: 1.0\nContent-type: %s\nX-Mailer: %s\nSubject:%s \n" % (to_email, from_email, content_type, xmailer, subject)
-    	
-    	content = header + "\n" + msg
-    	
-    else:
-		# attachment
-		attachment_name = values[5]
-		extract = open(attachment_name, 'r')
-		encoded_attachment = extract.read()
+	# list format:
+	# [0-profile, 1-to, 2-subject, 3-message, 4-text/html, 5-attachment, 6-interactive, 7-batch, 8-version ]
+	arguments = [args.profile, args.to, args.subject, args.message, args.html, args.attachment, args.interactive, args.batch, args.version]
+	
+	
+	return arguments
+	
 		
-		
-		#Main Header
-		header = """
-		To:%s\n
-		From:%s\n
-		MIME-Version: 1.0\n
-		X-Mailer: %s\n
-		Subject:%s \n
-		Content-Type: multipart/mixed; boundary=%s\n
-		--%s\n
-		Content-type: %s\n
-		Content-Transfer-Encoding:8bit\n""" % (to_email, from_email, xmailer, subject, marker, marker, content_type)
 
-		after_body = '--%s' %(marker)
-		
-		# attachment header
-		attachment_header = '''
-		Content-Type: text/plain; 
-		name=\"%s\"\n
-		Content-Disposition: attachment; filename=%s\n\n
-		%s\n
-		--%s--''' %(attachment_name, attachment_name, encoded_attachment, marker)
+if __name__ == '__main__':
+	main()
+	test_profiles()
+	test_options(arguments)
 
-		content = header + "\n" + msg +"\n"+after_body+'\n'+attachment_header
-    
-    
-    smtpserver = initialize_smtp_server(profile)
-    smtpserver.sendmail(from_email, to_email, content)
-    smtpserver.close()
-    
-    #Print useful info
-    print '='*80
-    print 'e-mail sent'
-    print '='*80
-    '''
-    print header
-    print '-'*80
-    print msg
-    print '='*80
-    '''
-    print content
-
-
-if args.version is True:
-	version_info = AppInfo['AppName']+'-v'+AppInfo['Version']
-	print version_info
-	quit()
-	    
-print '='*80
-print 'gxmail - version %s' %(AppInfo['Version'])
-print '='*80
-test_profiles()
