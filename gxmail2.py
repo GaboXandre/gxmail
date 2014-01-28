@@ -109,8 +109,50 @@ def send_mail(arguments):
 	
 	
 	
-def batch_mode():
-	print 'you are now in batch mode...'
+def batch_mode(arguments):
+	print 'you are now in batch mode...' ##########DEBUG
+	############################################
+	# 0. Prepare arguments
+	############################################
+	mime_type = arguments[4]
+	if mime_type is True:
+		arguments[4] = 'text/html'
+	else:
+		arguments[4] = 'text/plain'
+	
+	
+	############################################
+	# 1. Get the file with emails
+	############################################
+	batch_file_path = str(arguments[7])
+	batch_file = open(os.path.expanduser(batch_file_path)) 
+	
+	############################################
+	# 2. Itirate file to make the list
+	############################################
+	mail_list = []
+	with batch_file as f:
+		for line in f:
+		    x = line.rstrip( )
+		    mail_list.append(x)
+		batch_file.close()
+	
+	############################################
+	# 3. Iterate list and send emails
+	############################################
+	length = len(mail_list)
+	cntr = 0
+	while cntr < length:
+		arguments[1] = mail_list[cntr]
+		send_mail(arguments)
+		#print 'email sent to: '+str(mail_list[cntr])
+		#print '-'*80
+		cntr += 1
+	############################################
+	# DEBUG INFO
+	############################################
+	print batch_file_path
+	print mail_list
 
 def interactive_mode():
 	print '-'*80
@@ -226,7 +268,7 @@ def test_options(arguments):
 		quit()
 	
 	if batch != 'None':
-		batch_mode()
+		batch_mode(arguments)
 		quit()
 	
 	if interactive is True:
