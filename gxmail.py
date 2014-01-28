@@ -40,8 +40,8 @@ def settings_mode():
 		print '-'*80
 		print ' 1 - View profiles'
 		print ' 2 - Add new profile'
-		#print ' 3 - Delete existing profile'
-		#print ' 4 - Edit existing profile'
+		print ' 3 - Delete existing profile'
+		print ' 4 - Edit existing profile'
 		print ' 0 - Exit'
 		print '-'*80
 		
@@ -73,6 +73,9 @@ def settings_mode():
 			
 		elif MenuOption == '3':
 			print ' 3 - Delete existing profile'
+			delete = raw_input('Enter profile name to delete -> ')
+			fullpath = FileLocations['ProfileDir']+delete
+			os.remove(fullpath)
 		elif MenuOption == '4':
 			print ' 4 - Edit existing profile'
 		elif MenuOption == '0':
