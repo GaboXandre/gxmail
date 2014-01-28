@@ -67,29 +67,24 @@ In batch mode, *gxmail* will read a list recepients from a text file.
 
 ## Install
 
-* Copy *gxmail.py* to your desired application.
-* *gxmail* will store profiles in *~/.gxmail*, you will need to create this directory manually. And keep it empty, do **NOT** place *gxmail.py* inside it.
+* Uncompress the archive
+* Copy *gxmail.py* to your desired directory. We recommend ```/usr/bin``` as it will be included in the PATH. 
+* Run ```gxmail``` and it will complete the set up (see *first run* below for details)
 
 ```
-mkdir ~/.gxmail
-```
-
-* Make sure *gxmail.py* is executable
-
-```
-chmod +x <path>/gxmail.py
-```
-
-* Run the script, you will be prompted to create your default profile.
-
-```
-./gxmail.py
+cd path/to/gxmail
+sudo cp gxmail.py /usr/bin/gxmail 	# copy file
+sudo chmod +x /usr/bin/gxmail 		# make it excecutable
+gxmail								# first run will complete setup.
 ```
 
 # Profiles
 
 ## First Run
-When you first run *gxmail.py* it will prompt you to create your default profile:
+When you first run *gxmail.py* it will:
+1. create **~/.gxmail** to store you profiles
+2. prompt you to create your default profile:
+
 ```
  You don't have a profile set up yet. Let's do it now!
  Server -> smtp.mydomain.com

@@ -434,6 +434,7 @@ def main():
 			}
 
 	FileLocations = { 'ProfileDir' : os.path.expanduser('~/.gxmail/')}
+
 	
 	# Command Line Arguments
 	parser = argparse.ArgumentParser(description='%s is a simple text smpt client to send email from the command line. Very useful for scripts. If called without parameters, it starts in interactive mode.' %(AppInfo['AppName']))
@@ -452,8 +453,7 @@ def main():
 	# list format:
 	# [0-profile, 1-to, 2-subject, 3-message, 4-text/html, 5-attachment, 6-interactive, 7-batch, 8-version, 9-settings ]
 	arguments = [args.profile, args.to, args.subject, args.message, args.html, args.attachment, args.interactive, args.batch, args.version, args.settings]
-	
-	
+
 	return arguments
 	
 		
