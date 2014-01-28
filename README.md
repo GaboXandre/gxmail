@@ -43,6 +43,8 @@ The following arguments are available
   -a ATTACHMENT, --attachment ATTACHMENT
                         Send file attachment.
                         
+  -set, --settings      Access your profile settings. 
+                        
 ```
 
 ## Interactive Mode
@@ -97,6 +99,18 @@ When you first run *gxmail.py* it will prompt you to create your default profile
  You are ready to send emails with your new profile!
 ```
 ## Profile Management
+### Settings Mode
+Running gxmail with argument **-set** or **--settings** will call a simple command line menu to manage your profiles.
+
+```
+ 1 - View profiles                 
+ 2 - Add new profile                        
+ 3 - Delete existing profile          
+ 0 - Exit 
+```
+
+
+### Profile Files
 Each profile is stored as a text file inside *~/.gxmail*
 You can simply delete each file to remove a profile.
 It is also posible to edit them with your favorite text editor, just remember to keep the structure:

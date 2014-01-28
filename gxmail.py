@@ -41,20 +41,22 @@ def settings_mode():
 		print ' 1 - View profiles'
 		print ' 2 - Add new profile'
 		print ' 3 - Delete existing profile'
-		print ' 4 - Edit existing profile'
 		print ' 0 - Exit'
 		print '-'*80
 		
 		MenuOption = raw_input('Enter a selection -> ')
-		print 'you selected '+str(MenuOption)
 		if MenuOption == '1':
-			print ' 1 - View profiles'
+			print 'Installed Profiles:'
 			f = []
 			for (dirpath, dirnames, filenames) in os.walk(FileLocations['ProfileDir']):
 				f.extend(filenames)
 				break
-			print f
-			
+			cntr = 0
+			length = len(f)
+			while cntr < length:
+				print str(cntr)+' - '+f[cntr]
+				cntr += 1
+			raw_input('Press ENTER to continue')
 		elif MenuOption == '2':
 			print "Let's create a new profile: "
 			prof_name = raw_input('Profile Name -> ')
@@ -75,9 +77,13 @@ def settings_mode():
 			print ' 3 - Delete existing profile'
 			delete = raw_input('Enter profile name to delete -> ')
 			fullpath = FileLocations['ProfileDir']+delete
-			os.remove(fullpath)
-		elif MenuOption == '4':
-			print ' 4 - Edit existing profile'
+			try:
+				os.remove(fullpath)
+				print 'Done, the profile at "%s" has been deleted.' %(fullpath)
+				raw_input('Press ENTER to continue')
+			except Exception:
+				print 'Opps, the profile at "%s" could not be deleted. Sorry' %(fullpath)
+				raw_input('Press ENTER to continue')
 		elif MenuOption == '0':
 			loop = False
 		else:
