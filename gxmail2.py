@@ -148,11 +148,7 @@ def batch_mode(arguments):
 		#print 'email sent to: '+str(mail_list[cntr])
 		#print '-'*80
 		cntr += 1
-	############################################
-	# DEBUG INFO
-	############################################
-	print batch_file_path
-	print mail_list
+	
 
 def interactive_mode():
 	print '-'*80
@@ -266,6 +262,10 @@ def test_options(arguments):
 		version_info = AppInfo['AppName']+'-v'+AppInfo['Version']
 		print version_info
 		quit()
+	# once version is ruled out comes the welcome to the program.
+	print '='*80
+	print 'gxmail - version %s' %(AppInfo['Version'])
+	print '='*80
 	
 	if batch != 'None':
 		batch_mode(arguments)
@@ -384,9 +384,7 @@ def main():
 	# list format:
 	# [0-profile, 1-to, 2-subject, 3-message, 4-text/html, 5-attachment, 6-interactive, 7-batch, 8-version ]
 	arguments = [args.profile, args.to, args.subject, args.message, args.html, args.attachment, args.interactive, args.batch, args.version]
-	print '='*80
-	print 'gxmail - version %s' %(AppInfo['Version'])
-	print '='*80
+	
 	
 	return arguments
 	
