@@ -427,7 +427,7 @@ def main():
 	global FileLocations
 	global arguments
 	AppInfo = { 'AppName' : 'gxmail',
-			'Version' : '1.1.8',
+			'Version' : '1.2.0',
 			'Author' : 'GaboXandre',
 			'License' : 'GPL3',
 			'copyright' : '2014 GaboXandre'
