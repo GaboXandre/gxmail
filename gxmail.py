@@ -236,8 +236,16 @@ def interactive_mode():
 		h = 'text/plain'
 	t = raw_input('To: ')
 	s = raw_input('Subject: ')
-	m = raw_input('Body File Path: ')
-		 
+	# write the body with text editor
+	print 'Choose your editor:'
+	print '(v) for Vi'
+	print '(n) for Nano'
+	e = raw_input('editor -> ')
+	if e == 'v':
+		text = os.system('vi ~/.email-body')	 
+	else:
+		text = os.system('nano ~/.email-body')
+	m = os.path.expanduser('~/.email-body')
 	
 	############################################
 	# 2. Start the list
@@ -287,7 +295,8 @@ def interactive_mode():
 	arguments.append('None')
 	arguments.append(False)
 	send_mail(arguments)
-
+	# Remove the temporary file
+	os.system('rm ~/.email-body')
 
 	
 
